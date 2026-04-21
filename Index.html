@@ -1,0 +1,145 @@
+Actúa como un desarrollador senior especializado en React, Node.js y Firebase.
+
+Crea una aplicación completa llamada "Studio Boutique" con las siguientes características:
+
+🔹 FRONTEND (React + Tailwind)
+- Dashboard con métricas (ventas, meta, productos)
+- Catálogo de productos con imágenes
+- Detalle de producto con botón de WhatsApp
+- Registro de ventas con cálculo automático (2x25$)
+- Página de promociones
+- Reportes con gráficos
+
+🔹 BACKEND (Node.js + Express)
+- API REST:
+  - GET /products
+  - POST /products
+  - POST /sales
+  - GET /reports
+- Manejo de promociones
+- Cálculo automático de precios
+
+🔹 BASE DE DATOS
+- MongoDB o Firebase:
+  - Productos
+  - Ventas
+  - Promociones
+
+🔹 FUNCIONALIDAD CLAVE
+- Integración WhatsApp dinámica:
+  https://wa.me/584242105463?text=Hola quiero comprar [producto]
+
+🔹 DISEÑO
+- Elegante femenino (rosado, blanco, negro)
+- Responsive (mobile-first)
+
+🔹 EXTRA
+- Código limpio
+- Modular
+- Listo para producción
+
+Entrega:
+- Código completo
+- Instrucciones de instalación
+- Scripts de ejecución
+
+npm create vite@latest frontend
+cd frontend
+npm install
+npm install axios react-router-dom
+npm install -D tailwindcss
+
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Home from "./pages/Home";
+import Products from "./pages/Products";
+import Sales from "./pages/Sales";
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/products" element={<Products />} />
+        <Route path="/sales" element={<Sales />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
+export default App;
+
+          import { useEffect, useState } from "react";
+import axios from "axios";
+
+export default function Products() {
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    axios.get("http://localhost:3000/products")
+      .then(res => setProducts(res.data));
+  }, []);
+
+  return (
+    <div>
+      <h1>Productos</h1>
+      {products.map(p => (
+        <div key={p._id}>
+          <h2>{p.name}</h2>
+          <p>${p.price}</p>
+          <a href={`https://wa.me/584242105463?text=Hola quiero comprar ${p.name}`}>
+            Comprar por WhatsApp
+          </a>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+          mkdir backend
+cd backend
+npm init -y
+npm install express cors mongoose
+
+          const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+mongoose.connect("mongodb://localhost:27017/studio");
+
+const Product = mongoose.model("Product", {
+  name: String,
+  price: Number,
+  promo: String,
+  stock: Number
+});
+
+app.get("/products", async (req, res) => {
+  const products = await Product.find();
+  res.json(products);
+});
+
+app.post("/products", async (req, res) => {
+  const newProduct = new Product(req.body);
+  await newProduct.save();
+  res.json(newProduct);
+});
+
+app.post("/sales", (req, res) => {
+  const { price, quantity } = req.body;
+
+  let total = price * quantity;
+
+  // PROMO 2x25
+  if (quantity >= 2) total = 25;
+
+  res.json({ total });
+});
+
+app.listen(3000, () => console.log("Servidor activo"));
+if (cantidad >= 2) {
+  total = 25;
+}

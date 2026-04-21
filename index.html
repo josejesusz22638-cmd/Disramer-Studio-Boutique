@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Studio Boutique | Panel Administrativo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --boutique-pink: #fdf2f8;
+            --boutique-accent: #db2777;
+        }
+        body { background-color: white; color: #1f2937; }
+        .pink-gradient { background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%); }
+    </style>
+</head>
+<body class="font-sans">
+
+    <nav class="bg-black text-white p-4 shadow-lg flex justify-between items-center">
+        <h1 class="text-xl font-serif tracking-widest uppercase">Studio Boutique</h1>
+        <div class="space-x-4 text-sm uppercase">
+            <a href="#" onclick="showSection('dashboard')" class="hover:text-pink-400">Dashboard</a>
+            <a href="#" onclick="showSection('inventario')" class="hover:text-pink-400">Inventario</a>
+        </div>
+    </nav>
+
+    <main id="dashboard" class="p-6 max-w-6xl mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="pink-gradient p-6 rounded-2xl shadow-sm border border-pink-200">
+                <p class="text-pink-600 font-bold uppercase text-xs">Ventas del Mes</p>
+                <h2 class="text-3xl font-bold" id="totalVentas">$0.00</h2>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <p class="text-gray-500 font-bold uppercase text-xs">Promoción Activa</p>
+                <h2 class="text-2xl font-bold text-pink-500">2 x $25.00</h2>
+            </div>
+            <div class="bg-black text-white p-6 rounded-2xl shadow-sm">
+                <p class="text-pink-400 font-bold uppercase text-xs">Meta Mensual</p>
+                <h2 class="text-3xl font-bold">85%</h2>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 mb-8">
+            <h3 class="text-lg font-bold mb-4">Reporte de Rendimiento</h3>
+            <canvas id="salesChart" height="100"></canvas>
+        </div>
+    </main>
+
+    <section id="inventario" class="hidden p-6 max-w-6xl mx-auto">
+        <h2 class="text-2xl font-bold mb-6 border-b pb-2">Registro de Ventas</h2>
+        <div class="bg-pink-50 p-6 rounded-xl border border-pink-100">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <select id="prodSelect" class="p-3 rounded-lg border">
+                    <option value="Blusa Premium">Blusa Premium ($15)</option>
+                    <option value="Jean Ajustado">Jean Ajustado ($20)</option>
+                    <option value="Vestido Noche">Vestido Noche ($35)</option>
+                </select>
+                <input type="number" id="cantSelect" placeholder="Cantidad" class="p-3 rounded-lg border">
+            </div>
+            <button onclick="registrarVenta()" class="mt-4 bg-black text-white px-8 py-3 rounded-full hover:bg-pink-600 transition w-full md:w-auto">
+                Registrar Venta
+            </button>
+        </div>
+    </section>
+
+    <a href="https://wa.me/584242105463?text=Hola%20Studio%20Boutique,%20quiero%20consultar%20por%20un%20producto" 
+       target="_blank" 
+       class="fixed bottom-6 right-6 bg-green-500 text-white p-4 rounded-full shadow-2xl hover:scale-110 transition">
+        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.588-5.946 0-6.556 5.332-11.891 11.892-11.891 3.181 0 6.167 1.24 8.413 3.488 2.246 2.248 3.484 5.237 3.484 8.417 0 6.556-5.332 11.89-11.892 11.89-2.003 0-3.96-.503-5.703-1.462l-6.193 1.667zm6.632-4.145c1.554.921 3.09 1.403 4.757 1.403 5.164 0 9.366-4.202 9.366-9.366 0-2.502-1.003-4.856-2.818-6.673-1.815-1.817-4.167-2.822-6.702-2.822-5.164 0-9.366 4.202-9.366 9.366 0 1.777.472 3.498 1.407 5.076l-1.004 3.665 3.812-1.026z"/></svg>
+    </a>
+
+    <script>
+        let totalAcumulado = 0;
+
+        function showSection(id) {
+            document.getElementById('dashboard').classList.add('hidden');
+            document.getElementById('inventario').classList.add('hidden');
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        function registrarVenta() {
+            const cant = parseInt(document.getElementById('cantSelect').value);
+            let subtotal = 0;
+
+            // Lógica de promoción 2x25
+            if (cant === 2) {
+                subtotal = 25;
+            } else {
+                subtotal = cant * 15; // Precio base ejemplo
+            }
+
+            totalAcumulado += subtotal;
+            document.getElementById('totalVentas').innerText = `$${totalAcumulado.toFixed(2)}`;
+            alert("Venta registrada con éxito");
+            showSection('dashboard');
+        }
+
+        // Gráfico Inicial
+        const ctx = document.getElementById('salesChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4'],
+                datasets: [{
+                    label: 'Ventas Semanales',
+                    data: [120, 190, 300, 250],
+                    borderColor: '#db2777',
+                    tension: 0.4,
+                    fill: true,
+                    backgroundColor: 'rgba(219, 39, 119, 0.1)'
+                }]
+            },
+            options: { responsive: true }
+        });
+    </script>
+</body>
+</html>
